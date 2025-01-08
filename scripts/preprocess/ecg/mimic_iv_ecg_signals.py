@@ -23,7 +23,7 @@ def postprocess_mimic_iv_ecg_meta(meta: pd.DataFrame):
 
 def main(args):
     records = pd.read_csv(os.path.join(args.processed_root, "records.csv"))
-    records["path"] = os.path.join(args.raw_root, "mimic-iv-ecg-diagnostic-electrocardiogram-matched-subset-1.0") + '/' + records["path"]
+    records["path"] = args.raw_root + '/' + records['path'] 
     records["save_file"] = (SOURCE + "_") + \
         filenames_from_paths(records["path"], replacement_ext=".mat")
     records["source"] = SOURCE
