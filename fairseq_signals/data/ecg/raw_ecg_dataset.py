@@ -143,8 +143,10 @@ class RawECGDataset(BaseDataset):
         return index
 
     def perturb(self, feats):
-        new_feats = feats.clone()
+        if not self.training:
+            return feats
 
+        new_feats = feats.clone()
         for aug in self.aug_list:
             new_feats = aug(new_feats)
 
@@ -162,6 +164,7 @@ class RawECGDataset(BaseDataset):
         feats = self.load_specific_leads(feats, leads_to_load=leads_to_load, pad=self.pad_leads)
 
         if self.filter:
+            import neurokit2 as nk
             feats = torch.from_numpy(
                 np.stack([nk.ecg_clean(l, sampling_rate=500) for l in feats])
             )
@@ -261,7 +264,7 @@ class RawECGDataset(BaseDataset):
 
         sources = [s["source"] for s in samples]
         originals = None
-        if self.retain_original:
+        if self.retain_original and "original" in samples[0]:
             originals = [s["original"] for s in samples]
         sizes = [s.size(-1) for s in sources]
 
@@ -458,7 +461,7 @@ class FileECGDataset(RawECGDataset):
             if self.label_array is not None:
                 res["label"] = torch.from_numpy(self.label_array[ecg["idx"].squeeze()])
             else:
-                res["label"] = torch.from_numpy(ecg['label'].squeeze())
+                res["label"] = torch.from_numpy(ecg['label'].squeeze(0))
 
         return res
 
@@ -512,7 +515,7 @@ class PathECGDataset(FileECGDataset):
         if "target_idx" in samples[0]:
             out["target_idx"] = [s["target_idx"] for s in samples]
         if self.label:
-            out["label"] = [[s["label"] for s in samples]]
+            out["label"] = [s["label"] for s in samples]
         if "attribute_id" in samples[0]:
             out["attribute_id"] = [s["attribute_id"] for s in samples]
 
@@ -550,7 +553,7 @@ class PathECGDataset(FileECGDataset):
             if self.label_array is not None:
                 res["label"] = torch.from_numpy(self.label_array[data["idx"].squeeze()])
             else:
-                res["label"] = torch.from_numpy(data["label"].squeeze())
+                res["label"] = torch.from_numpy(data["label"].squeeze(0))
 
         if "target_idx" in data:
             res["target_idx"] = torch.from_numpy(data["target_idx"][0])

@@ -133,9 +133,19 @@ def main(args):
         Command line arguments.
     """
     os.makedirs(args.processed_root, exist_ok=True)
+<<<<<<< HEAD
 
     record_list_csv = os.path.join(args.raw_root, "record_list.csv")
     print(f"reading {record_list_csv}")
+=======
+    
+    record_list_csv = os.path.join(
+        args.raw_root,
+        # "mimic-iv-ecg-diagnostic-electrocardiogram-matched-subset-1.0/record_list.csv",
+        "record_list.csv",
+    )
+    print(f'reading {record_list_csv}')
+>>>>>>> d68d365455c46ac7435bc241cd82536d5f18bc6b
     records = pd.read_csv(record_list_csv)
 
     results = {}
@@ -164,7 +174,11 @@ def main(args):
         )
         results["cardiac_markers"] = cardiac_markers
 
+<<<<<<< HEAD
     # WGL: commented this out because these files aren't in MIMIC-IV-ECG 1.0, they are in the older unavailable version
+=======
+    # WGL: commented this out because these files aren't in MIMIC-IV-ECG 1.0, they are in the older unavailable version 
+>>>>>>> d68d365455c46ac7435bc241cd82536d5f18bc6b
     # # Incorporate machine diagnoses/reports
     # machine_diagnoses = pd.read_csv(
     #     os.path.join(args.raw_root, "mimic_iv_ecg_machine_diagnoses.csv")
@@ -175,11 +189,24 @@ def main(args):
     #     os.path.join(args.raw_root, "mimic_iv_ecg_machine_report.csv")
     # )
     # records['machine_report'] = machine_report['0']
-    results["records"] = records
+    # Incorporate machine diagnoses/reports
+    measurements = pd.read_csv(
+        os.path.join(
+            args.raw_root,
+            "mimic-iv-ecg-diagnostic-electrocardiogram-matched-subset-1.0/machine_measurements.csv",
+        ),
+        low_memory=False,
+    )
+    reports = measurements[
+        measurements.columns[measurements.columns.str.startswith('report_')]
+    ].fillna('').agg('; '.join, axis=1).str.replace(r'(;\s*)+', '; ', regex=True).str.strip('; ')
+
+    records['machine_report'] = reports
+    results['records'] = records
 
     # Save results
     for filename, data in results.items():
-        print(f"writing {filename}.csv")
+        print(f'writing {filename}.csv')
         data.to_csv(os.path.join(args.processed_root, f"{filename}.csv"), index=False)
 
 
