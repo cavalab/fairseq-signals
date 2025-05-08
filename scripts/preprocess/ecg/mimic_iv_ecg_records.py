@@ -106,8 +106,10 @@ def main(args):
     
     record_list_csv = os.path.join(
         args.raw_root,
-        "mimic-iv-ecg-diagnostic-electrocardiogram-matched-subset-1.0/record_list.csv",
+        # "mimic-iv-ecg-diagnostic-electrocardiogram-matched-subset-1.0/record_list.csv",
+        "record_list.csv",
     )
+    print(f'reading {record_list_csv}')
     records = pd.read_csv(record_list_csv)
 
     results = {}
@@ -133,20 +135,22 @@ def main(args):
         )
         results['cardiac_markers'] = cardiac_markers
 
-    # Incorporate machine diagnoses/reports
-    machine_diagnoses = pd.read_csv(
-        os.path.join(args.raw_root, "mimic_iv_ecg_machine_diagnoses.csv")
-    )
-    records['machine_diagnosis'] = machine_diagnoses['0']
+    # WGL: commented this out because these files aren't in MIMIC-IV-ECG 1.0, they are in the older unavailable version 
+    # # Incorporate machine diagnoses/reports
+    # machine_diagnoses = pd.read_csv(
+    #     os.path.join(args.raw_root, "mimic_iv_ecg_machine_diagnoses.csv")
+    # )
+    # records['machine_diagnosis'] = machine_diagnoses['0']
 
-    machine_report = pd.read_csv(
-        os.path.join(args.raw_root, "mimic_iv_ecg_machine_report.csv")
-    )
-    records['machine_report'] = machine_report['0']
+    # machine_report = pd.read_csv(
+    #     os.path.join(args.raw_root, "mimic_iv_ecg_machine_report.csv")
+    # )
+    # records['machine_report'] = machine_report['0']
     results['records'] = records
 
     # Save results
     for filename, data in results.items():
+        print(f'writing {filename}.csv')
         data.to_csv(os.path.join(args.processed_root, f"{filename}.csv"), index=False)
 
 if __name__ == "__main__":

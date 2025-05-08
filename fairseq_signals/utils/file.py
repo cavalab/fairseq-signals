@@ -132,9 +132,12 @@ def remove_common_segments(paths: pd.Series) -> pd.Series:
     pd.Series
         Series with the common segments removed from each path.
     """
+
     common_prefix = os.path.commonprefix(list(paths[~paths.isna()].values))
-    if common_prefix[-1] != "/":
-        common_prefix = common_prefix[:common_prefix.rfind("/") + 1]
+    print('common_prefix:',common_prefix)
+    if len(common_prefix) > 0:
+        if common_prefix[-1] != "/":
+            common_prefix = common_prefix[:common_prefix.rfind("/") + 1]
 
     return paths.str.slice(start=len(common_prefix))
 
