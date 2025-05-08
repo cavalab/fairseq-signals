@@ -141,10 +141,6 @@ def main(cfg: Config) -> None:
             cfg.dataset.max_tokens, cfg.dataset.batch_size
         )
     )
-
-    import ipdb
-
-    ipdb.set_trace()
     # Load the latest checkpoint if one is available and restore the
     # corresponding train iterator
     extra_state, epoch_itr = checkpoint_utils.load_checkpoint(
