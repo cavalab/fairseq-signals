@@ -36,11 +36,20 @@ def main(args):
     os.makedirs(args.processed_root, exist_ok=True)
 
     records_file = os.path.join(args.raw_root, "RECORDS_all.txt")
+    train_records_file = os.path.join(args.raw_root, "RECORDS_train.txt")
     print(f"reading {records_file}")
     with open(records_file, "r") as rf:
         records = [r.strip() for r in rf.readlines()]
+    print(f"reading {train_records_file}")
+    with open(train_records_file, "r") as rf:
+        train_records = [r.strip() for r in rf.readlines()]
+    print('generating fold...')
+    fold = ['train' if ecg_id in train_records else 'test' for ecg_id in records]
     records_df = pd.DataFrame(
-        {"ecg_id": records, "path": "all_ECGs_float32_T_grouped.h5"}
+        {"ecg_id": records, 
+        "path": "all_ECGs_float32_T_grouped.h5",
+        'fold': fold
+        }
     )
     filename = "records"
     print(f"writing {filename}.csv")
