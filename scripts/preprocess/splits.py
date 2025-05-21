@@ -1,4 +1,3 @@
-from typing import Union
 import os
 import argparse
 
@@ -99,6 +98,12 @@ def get_parser():
         default=None,
         help="Columns from the metadata to keep in the new files."
     )
+    parser.add_argument(
+        "--split_col",
+        type=str,
+        default=None,
+        help="Column with split already provided. Skips data splitting and uses this column."
+    )
 
     return parser
 
@@ -108,7 +113,6 @@ def process_str_list(text_lst):
 def main(args):
     # Load the metadata
     meta = pd.read_csv(os.path.join(args.processed_root, args.meta_file))
-
     # Subset datasets
     if args.dataset_subset is not None:
         dataset_subset = pd.Series(
@@ -126,16 +130,19 @@ def main(args):
     if args.strategy == 'grouped_temporal':
         kwargs['filter_strategy'] = args.grouped_temporal_filter_strategy
 
-    splitter = DatasetSplitter(
-        args.strategy,
-        args.fractions,
-        group_col=args.group_col,
-        date_col=args.date_col,
-        split_labels=process_str_list(args.split_labels).values,
-        split_col='split',
-        **kwargs
-    )
-    meta = splitter(meta)
+    if args.split_col:
+        meta['split'] = meta[args.split_col]
+    else:
+        splitter = DatasetSplitter(
+            args.strategy,
+            args.fractions,
+            group_col=args.group_col,
+            date_col=args.date_col,
+            split_labels=process_str_list(args.split_labels).values,
+            split_col='split',
+            **kwargs
+        )
+        meta = splitter(meta)
 
     # Determine which columns to keep in the files being saved
     keep_cols = ['idx', 'save_file', 'split']

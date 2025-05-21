@@ -36,7 +36,7 @@ def extract_bch(
     ecg_file = h5py.File(os.path.join(args.raw_root, ecg_file), "r")
 
     fields = {
-        "sample_rate": 500  # Extract sample rate from the row or the file
+        "sample_rate": 250  # Extract sample rate from the row or the file
     }
     # A NumPy array having shape (channels, sample size)
     feats = ecg_file[row["ecg_id"]][:]

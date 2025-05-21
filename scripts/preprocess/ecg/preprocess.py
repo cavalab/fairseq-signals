@@ -196,6 +196,8 @@ def preprocess_mat(row, desired_sample_rate, standardize, constant_lead_strategy
     savemat(row["save_path"], data)
 
 def segment_mat(row, seconds, expected_sample_rate):
+    import ipdb
+    ipdb.set_trace()
     data = loadmat(row["path"])
     feats = data["feats"]
     curr_sample_rate = data["curr_sample_rate"][0, 0]
@@ -397,6 +399,7 @@ def pipeline(
     elif os.path.isfile(args.manifest_file):
         manifest = pd.read_csv(args.manifest_file)
         records["idx"] += manifest["idx"].max() + 1
+
 
     if args.no_parallel:
         from tqdm import tqdm

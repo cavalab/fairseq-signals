@@ -22,23 +22,26 @@ BCH_ROOT="${LABSHARE}/All_ECGs/"
 # Simply rename exams.csv to records.csv and place it in the processed root
 mkdir -p "${PROCESSED_ROOT}/bch/"
 
-echo "bch_records.py"
-python -u ${SCRIPTS}/bch_records.py \
-    --processed_root "$PROCESSED_ROOT/bch" \
-    --raw_root "$BCH_ROOT" \
+# echo "bch_records.py"
+# python -u ${SCRIPTS}/bch_records.py \
+#     --processed_root "$PROCESSED_ROOT/bch" \
+#     --raw_root "$BCH_ROOT" \
 
 python -u ${SCRIPTS}/bch_signals.py --help
-
+echo "bch_signals.py"
+    # --skip org,preprocessed \
+    # --no_parallel 
 python -u ${SCRIPTS}/bch_signals.py \
     --processed_root "$PROCESSED_ROOT/bch" \
     --raw_root "$BCH_ROOT/" \
     --manifest_file "$PROCESSED_ROOT/manifest.csv" 
     
-# echo "splits.py"
-# python ${SCRIPTS}/../splits.py \
-#     --strategy "grouped" \
-#     --processed_root "$PROCESSED_ROOT/bch" \
-#     --group_col "subject_id" \
-#     --filter_cols "nan_any,constant_leads_any"
+echo "splits.py"
+    --strategy "random" \
+python ${SCRIPTS}/../splits.py \
+    --strategy "random" \
+    --processed_root "$PROCESSED_ROOT/bch" \
+    --filter_cols "nan_any,constant_leads_any" \
+    --split_col "pretrain_fold"
 
 # TODO: separate label generation for each outcome

@@ -4,6 +4,7 @@ import os
 import argparse
 
 import pandas as pd
+import numpy as np
 
 
 def get_parser():
@@ -36,19 +37,23 @@ def main(args):
     os.makedirs(args.processed_root, exist_ok=True)
 
     records_file = os.path.join(args.raw_root, "RECORDS_all.txt")
-    train_records_file = os.path.join(args.raw_root, "RECORDS_train.txt")
     print(f"reading {records_file}")
     with open(records_file, "r") as rf:
-        records = [r.strip() for r in rf.readlines()]
+        records = np.array([r.strip() for r in rf.readlines()])
+
+    train_records_file = os.path.join(args.raw_root, "RECORDS_train.txt")
     print(f"reading {train_records_file}")
     with open(train_records_file, "r") as rf:
-        train_records = [r.strip() for r in rf.readlines()]
+        train_records = np.array([r.strip() for r in rf.readlines()])
     print('generating fold...')
-    fold = ['train' if ecg_id in train_records else 'test' for ecg_id in records]
+    # https://numpy.org/doc/stable/reference/generated/numpy.in1d.html
+    train_mask = np.isin(records,train_records,assume_unique=True)
+    fold = ['train' if tm else 'test' for tm in train_mask] 
+    fold = [f if f == 'test' else 'val' if np.random.rand() < .1 else f for f in fold]
     records_df = pd.DataFrame(
         {"ecg_id": records, 
         "path": "all_ECGs_float32_T_grouped.h5",
-        'fold': fold
+        'pretrain_fold': fold
         }
     )
     filename = "records"

@@ -1,6 +1,4 @@
 from typing import (
-    Any,
-    Generator,
     Hashable,
     Iterable,
     List,
@@ -17,7 +15,6 @@ getcontext().prec = 10
 
 import numpy as np
 import pandas as pd
-from pandas.core.groupby.generic import DataFrameGroupBy
 
 from sklearn.model_selection import GroupShuffleSplit
 
@@ -285,7 +282,6 @@ def grouped_splits(
             raise ValueError("Incorrect number of labels.")
 
     groups = pd.Series(groups)
-
     split_arrays = []
     for _ in range(len(fractions) - 1):
         splitter = GroupShuffleSplit(train_size=fractions[0], **group_split_kwargs)
