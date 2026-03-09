@@ -75,7 +75,7 @@ def extract_bch(
     fields["avail_leads"] = str(avail_leads)
 
     # Recommended to extract feature information on mean, STD, nulls, and constants
-    fields.update(extract_feat_info(feats, leads_to_load))
+    # fields.update(extract_feat_info(feats, leads_to_load))
 
     meta = pd.concat([
         pd.Series({
@@ -83,7 +83,8 @@ def extract_bch(
             "sample_size": fields["org_sample_size"],
             "avail_leads": str(avail_leads),
         }),
-        pd.Series(fields)
+        # pd.Series(fields.drop(column='feats'))
+        pd.Series(extract_feat_info(feats, leads_to_load)),
     ])
 
     return meta

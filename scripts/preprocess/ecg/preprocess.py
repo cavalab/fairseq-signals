@@ -196,8 +196,6 @@ def preprocess_mat(row, desired_sample_rate, standardize, constant_lead_strategy
     savemat(row["save_path"], data)
 
 def segment_mat(row, seconds, expected_sample_rate):
-    import ipdb
-    ipdb.set_trace()
     data = loadmat(row["path"])
     feats = data["feats"]
     curr_sample_rate = data["curr_sample_rate"][0, 0]
@@ -213,11 +211,12 @@ def segment_mat(row, seconds, expected_sample_rate):
         )
 
     # Segment
-    segment_size = seconds * expected_sample_rate
+    segment_size = int(seconds * expected_sample_rate)
     n_segments = feats.shape[-1] // segment_size
 
     data["curr_sample_size"] = segment_size
     save_files = []
+    assert n_segments > 1
     for segment_i in range(n_segments):
         segment_feats = \
             feats[:, segment_i * segment_size: (segment_i + 1) * segment_size]
@@ -539,6 +538,7 @@ def pipeline(
         manifest_meta = meta[
             ["idx", "source", "source_path", "save_file", "sample_rate", "sample_size"]
         ].copy()
+
         manifest_meta.to_csv(
             args.manifest_file,
             index=False,
